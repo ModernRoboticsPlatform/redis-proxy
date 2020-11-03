@@ -1,0 +1,45 @@
+name: release 
+
+on:
+  push:
+    paths-ignore:
+      - '*.md'
+    tags:
+      - 'v\d+.\d+*'
+
+jobs:
+  release:
+    runs-on: [ubuntu-20.04]
+    env:
+      DOCKER_REGISTRY: docker.pkg.github.com
+      CONTAINER_NAME: redis-proxy
+      REPO_PATH: ${{ github.repository }}
+      CHART_REGISTRY_URL: chartmuseum.the-collective-group.com 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup ENV
+        run: |
+          echo "SERVICE_NAME=${REPO_PATH##*/}" >> $GITHUB_ENV
+          echo "DOCKER_REPOSITORY=${REPO_PATH,,}/${CONTAINER_NAME,,}" >> $GITHUB_ENV
+          echo "SHA_SHORT=$(git rev-parse --short=7 ${{ github.sha }})" >> $GITHUB_ENV
+          echo "TAG=${{ github.event.ref }}" >> $GITHUB_ENV 
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ env.DOCKER_REPOSITORY }}
+          registry: ${{ env.DOCKER_REGISTRY }}
+          tag_with_ref: true
+
+      - name: Push helm chart
+        run: |
+          helm lint ./charts/${SERVICE_NAME} 
+          helm package ./charts/${SERVICE_NAME} --version ${TAG##*/} --app-version ${TAG##*/}
+          helm push ./${SERVICE_NAME}-${TAG##*/}.tgz  \
+            http://${CHART_REGISTRY_URL} \
+            --username ${{ secrets.CHART_MUSEUM_USER }} \
+            --password ${{ secrets.CHART_MUSEUM_PASSWD }}
