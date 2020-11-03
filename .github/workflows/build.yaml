@@ -15,6 +15,8 @@ jobs:
       CONTAINER_NAME: redis-proxy
       REPO_PATH: ${{ github.repository }}
       CHART_REGISTRY_URL: chartmuseum.the-collective-group.com 
+      HELM_REPO_PASSWORD: ${{ secrets.CHART_MUSEUM_PASSWD }}
+      HELM_REPO_USERNAME: ${{ secrets.CHART_MUSEUM_USER }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -40,4 +42,4 @@ jobs:
           helm lint ./charts/${SERVICE_NAME}
           helm plugin install https://github.com/chartmuseum/helm-push.git
           helm package ./charts/${SERVICE_NAME} --version ${TAG##*/} --app-version ${TAG##*/}
-          helm push ./${SERVICE_NAME}-${TAG##*/}.tgz http://${CHART_REGISTRY_URL} --username ${{ secrets.CHART_MUSEUM_USER }} --password ${{ secrets.CHART_MUSEUM_PASSWD }}
+          helm push ./${SERVICE_NAME}-${TAG##*/}.tgz http://${CHART_REGISTRY_URL} 
