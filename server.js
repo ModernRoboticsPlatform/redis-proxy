@@ -28,8 +28,9 @@ wss.on('connection', function connection(ws, req) {
   })
 
   // Error with redis.
-  subscriber.on("error", function(channel, message) {
-    ws.send( '{"redis": "error"}' );
+  subscriber.on("error", function(error) {
+    console.log( error )
+    ws.send( '{"redis": "error", "data": error}' );
   })
 
   // ws client has disconnected.
