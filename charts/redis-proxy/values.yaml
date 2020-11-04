@@ -4,6 +4,10 @@
 
 replicaCount: 1
 
+#ws_port: 8080
+#redis_host: redis
+#redis_port: 6379
+
 image:
   repository: docker.pkg.github.com/modernroboticsplatform/redis-proxy/redis-proxy 
   pullPolicy: IfNotPresent

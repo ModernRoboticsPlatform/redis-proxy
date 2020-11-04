@@ -14,32 +14,46 @@ jobs:
       DOCKER_REGISTRY: docker.pkg.github.com
       CONTAINER_NAME: redis-proxy
       REPO_PATH: ${{ github.repository }}
-      CHART_REGISTRY_URL: chartmuseum.the-collective-group.com 
+      CHART_REGISTRY_URL: chartmuseum.the-collective-group.com
       HELM_REPO_PASSWORD: ${{ secrets.CHART_MUSEUM_PASSWD }}
       HELM_REPO_USERNAME: ${{ secrets.CHART_MUSEUM_USER }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup ENV
+      - 
+        name: Setup ENV
         run: |
           echo "SERVICE_NAME=${REPO_PATH##*/}" >> $GITHUB_ENV
-          echo "DOCKER_REPOSITORY=${REPO_PATH,,}/${CONTAINER_NAME,,}" >> $GITHUB_ENV
+          echo "DOCKER_REPOSITORY=modernroboticsplatform/${CONTAINER_NAME,,}" >> $GITHUB_ENV
           echo "SHA_SHORT=$(git rev-parse --short=7 ${{ github.sha }})" >> $GITHUB_ENV
           echo "TAG=${{ github.event.ref }}" >> $GITHUB_ENV 
 
-      - name: Build and push Docker images
-        uses: docker/build-push-action@v1
-        with:
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ env.DOCKER_REPOSITORY }}
-          registry: ${{ env.DOCKER_REGISTRY }}
-          tag_with_ref: true
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-      - name: Push helm chart
+      - 
+        name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWD }}
+
+      - 
+        name: Build and push Docker images
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ env.DOCKER_REPOSITORY }}:${{ env.TAG }}
+
+      - 
+        name: Push helm chart
         run: |
           helm lint ./charts/${SERVICE_NAME}
           helm plugin install https://github.com/chartmuseum/helm-push.git
           helm package ./charts/${SERVICE_NAME} --version ${TAG##*/} --app-version ${TAG##*/}
-          helm push ./${SERVICE_NAME}-${TAG##*/}.tgz http://${CHART_REGISTRY_URL} 
+          helm push ./${SERVICE_NAME}-${TAG##*/}.tgz https://${CHART_REGISTRY_URL} 
