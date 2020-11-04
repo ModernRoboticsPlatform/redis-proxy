@@ -9,7 +9,7 @@ replicaCount: 1
 #redis_port: 6379
 
 image:
-  repository: docker.pkg.github.com/modernroboticsplatform/redis-proxy/redis-proxy 
+  repository: docker.io/modernroboticsplatform/redis-proxy 
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
