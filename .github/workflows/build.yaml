@@ -27,7 +27,7 @@ jobs:
           echo "SERVICE_NAME=${REPO_PATH##*/}" >> $GITHUB_ENV
           echo "DOCKER_REPOSITORY=modernroboticsplatform/${CONTAINER_NAME,,}" >> $GITHUB_ENV
           echo "SHA_SHORT=$(git rev-parse --short=7 ${{ github.sha }})" >> $GITHUB_ENV
-          echo "TAG=${GITHUB_REF#refs/tags/} >> $GITHUB_ENV
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       -
         name: Set up QEMU
