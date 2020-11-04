@@ -27,7 +27,8 @@ jobs:
           echo "SERVICE_NAME=${REPO_PATH##*/}" >> $GITHUB_ENV
           echo "DOCKER_REPOSITORY=modernroboticsplatform/${CONTAINER_NAME,,}" >> $GITHUB_ENV
           echo "SHA_SHORT=$(git rev-parse --short=7 ${{ github.sha }})" >> $GITHUB_ENV
-          echo "TAG=${{ github.event.ref }}" >> $GITHUB_ENV 
+          echo "TEMP=${{ github.event.ref }}"
+          echo "TAG=${TEMP##*/}" >> $GITHUB_ENV
 
       -
         name: Set up QEMU
@@ -55,5 +56,5 @@ jobs:
         run: |
           helm lint ./charts/${SERVICE_NAME}
           helm plugin install https://github.com/chartmuseum/helm-push.git
-          helm package ./charts/${SERVICE_NAME} --version ${TAG##*/} --app-version ${TAG##*/}
-          helm push ./${SERVICE_NAME}-${TAG##*/}.tgz https://${CHART_REGISTRY_URL} 
+          helm package ./charts/${SERVICE_NAME} --version ${TAG} --app-version ${TAG}
+          helm push ./${SERVICE_NAME}-${TAG}.tgz https://${CHART_REGISTRY_URL} 
