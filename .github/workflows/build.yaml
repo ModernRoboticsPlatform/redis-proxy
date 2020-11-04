@@ -27,12 +27,12 @@ jobs:
           echo "SERVICE_NAME=${REPO_PATH##*/}" >> $GITHUB_ENV
           echo "DOCKER_REPOSITORY=modernroboticsplatform/${CONTAINER_NAME,,}" >> $GITHUB_ENV
           echo "SHA_SHORT=$(git rev-parse --short=7 ${{ github.sha }})" >> $GITHUB_ENV
-          echo "TEMP=${{ github.event.ref }}"
-          echo "TAG=${TEMP##*/}" >> $GITHUB_ENV
+          echo "TAG=${GITHUB_REF#refs/tags/} >> $GITHUB_ENV
 
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
+
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
