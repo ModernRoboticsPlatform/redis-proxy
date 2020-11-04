@@ -35,11 +35,11 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:          
             - name: "WS_PORT"
-              value: {{ .Values.ws_port | default "8080" }}
+              value: {{ .Values.ws_port | default "8080" | quote }}
             - name: "REDIS_HOST"
               value: {{ .Values.redis_host | default "redis" }}
             - name: "REDIS_PORT"
-              value: {{ .Values.redis_port | default "6379" }}
+              value: {{ .Values.redis_port | default "6379" | quote }}
           ports:
             - name: http
               containerPort: 8080
