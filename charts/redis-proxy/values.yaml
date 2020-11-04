@@ -51,7 +51,8 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: "*"
-      paths: "/websocket"
+      paths: 
+       - "/websocket"
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
