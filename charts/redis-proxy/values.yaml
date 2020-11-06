@@ -49,7 +49,10 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  path: "/websocket"
+  hosts:
+    - host: ""
+      paths:
+       - "/websocket"
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
